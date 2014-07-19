@@ -51,7 +51,7 @@ module QBWC
     def qwc
       qwc = <<QWC
 <QBWCXML>
-   <AppName>#{Rails.application.class.parent_name} #{Rails.env} #{@app_name_suffix}</AppName>
+   <AppName>#{QBWC.app_name} #{Rails.env} #{@app_name_suffix}</AppName>
    <AppID></AppID>
    <AppURL>#{QBWC.app_url || (root_url(:protocol => 'https://')+'qbwc/action')}</AppURL>
    <AppDescription>Quickbooks integration</AppDescription>
@@ -70,6 +70,7 @@ QWC
       map "tns:string" => [:string]
     end
 
+
     def server_version
       render :soap => {"tns:serverVersionResult" => server_version_response}
     end
@@ -79,10 +80,11 @@ QWC
     end
 
     def authenticate
+      binding.pry
       user = authenticate_user(params[:strUserName], params[:strPassword])
       if user
-        company = current_company
-        ticket = QBWC::QbwcSession.create.ticket if company
+        company = current_company(user)
+        ticket = create_session(user).ticket if company
         company ||= 'none'
       end
       render :soap => {"tns:authenticateResult" => {"tns:string" => [ticket || '', company || 'nvu']}}
@@ -91,6 +93,10 @@ QWC
     def send_request
       request = @session.current_request
       render :soap => {'tns:sendRequestXMLResult' => request.try(:request) || ''}
+    end
+
+    def create_session(user)
+      QBWC::QbwcSession.create
     end
 
     def receive_response
@@ -126,7 +132,7 @@ QWC
       username if username == QBWC.username && password == QBWC.password
     end
 
-    def current_company
+    def current_company(user)
       QBWC.company_file_path if QBWC.pending_jobs.count > 0
     end
 
@@ -140,7 +146,7 @@ QWC
 
     def run_response_callback
       job = @session.previous_job
-      obj = eval(job.klass).send(:find, job.klass_id)
+      obj = job.klass.constantize.send(:find, job.klass_id)
       resp = if @session.response
                # all is well(?). mark the previous job as processed
                job.processed = true

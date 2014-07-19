@@ -24,6 +24,10 @@ module QBWC
   mattr_accessor :min_version
   @@min_version = 3.0
 
+  # App name in quickbooks file
+  mattr_accessor :app_name
+  @@app_name = Rails.application.class.parent_name
+
   # Quickbooks app url provided in qwc file, defaults to root_url + ''
   mattr_accessor :app_url
   @@app_url = nil
@@ -57,8 +61,8 @@ module QBWC
 
   class << self
 
-    def pending_jobs
-      QBWC::QbwcJob.where(processed: false)
+    def pending_jobs(user)
+      QBWC::QbwcJob.where(processed: false, owner_id: user.id, owner_type: user.class.name)
     end
 
     def on_error=(reaction)

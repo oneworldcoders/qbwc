@@ -1,6 +1,8 @@
 class CreateQbwcSessions < ActiveRecord::Migration
   def change
     create_table :qbwc_sessions do |t|
+      t.integer :owner_id
+      t.string  :owner_type
       t.string :ticket
       t.string :user
       t.string :company, :limit => 1000

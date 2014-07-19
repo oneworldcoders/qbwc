@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "qbxml", [">= 0.1.3"]
   s.add_dependency "wash_out", [">= 0.7.1"]
-  s.add_dependency "i18n", [">= 0.6.5"]
+  s.add_dependency "i18n", [">= 0.6.1"]
   s.add_development_dependency('guard')
   s.add_development_dependency('guard-rspec')
   s.add_development_dependency('rb-fsevent')
