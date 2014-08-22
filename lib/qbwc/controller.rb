@@ -146,16 +146,7 @@ QWC
 
     def run_response_callback
       job = @session.previous_job
-      obj = job.klass.constantize.send(:find, job.klass_id)
-      resp = if @session.response
-               # all is well(?). mark the previous job as processed
-               job.processed = true
-               job.save!
-               Hash.from_xml(@session.response.gsub("\n", ""))
-             elsif @session.error
-               {error: @session.error}
-             end
-      obj.qb_response_handler(resp)
+      job.handle_response(@session)
     end
 
     def server_version_response

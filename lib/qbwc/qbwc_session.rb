@@ -10,16 +10,14 @@ module QBWC
     def current_request
       request = nil
       if job = self.next_job ||= next_job_in_queue
-        obj = job.klass.constantize.send(:find, job.klass_id)
-        request = obj.qb_payload
-        request = QBWC::Request.new(request)
+        request = job.generate_request
         advance
       end
       request
     end
 
     def next_job_in_queue
-      jobs = QBWC::QbwcJob.where(processed: false, owner_id: self.owner_id, owner_type: self.owner_type).order('id asc')
+      jobs = QBWC::QbwcJob.where(processed: false).order('id asc')
       jobs = jobs.where(owner_id: self.owner_id, owner_type: self.owner_type)
       jobs = jobs.where('id != ?', self.next_job.id) if self.next_job.present?
       jobs.limit(1).first
