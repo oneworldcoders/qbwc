@@ -80,7 +80,6 @@ QWC
     end
 
     def authenticate
-      binding.pry
       user = authenticate_user(params[:strUserName], params[:strPassword])
       if user
         company = current_company(user)
