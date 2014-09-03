@@ -91,6 +91,7 @@ QWC
 
     def send_request
       request = @session.current_request
+      puts request.try(:request)
       render :soap => {'tns:sendRequestXMLResult' => request.try(:request) || ''}
     end
 
@@ -145,7 +146,7 @@ QWC
 
     def run_response_callback
       job = @session.previous_job
-      job.handle_response(@session)
+      job.try(:handle_response, @session)
     end
 
     def server_version_response

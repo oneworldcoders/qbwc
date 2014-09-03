@@ -24,7 +24,7 @@ module QBWC
     end
 
     def advance
-      self.prev_qbwc_job_id = next_job.id
+      self.prev_qbwc_job_id = next_job.try(:id)
       self.next_qbwc_job_id = next_job_in_queue.try(:id) || nil
       self.save!
     end
