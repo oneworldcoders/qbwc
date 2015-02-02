@@ -1,5 +1,9 @@
 module QBWC
   module ModelMethods
+    def included(base)
+      base.extend ClassMethods
+    end
+
     def qb_payload
       raise 'You must add a method to your class called qb_payload.'
     end
@@ -13,6 +17,12 @@ module QBWC
       job.klass = self.class.to_s
       job.klass_id = self.id
       job.save
+    end
+
+    module ClassMethods
+      def on_qb_session_close
+        nil
+      end
     end
   end
 end
