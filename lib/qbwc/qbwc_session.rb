@@ -9,13 +9,16 @@ module QBWC
     attr_accessor :response
     @@before_session_hooks = Set.new
 
+    def self.add_before_session_hook(instance)
+      @@before_session_hooks << instance.class
+    end
+
     def current_request
       request = nil
       if job = self.next_job ||= next_job_in_queue
         obj = eval(job.klass).send(:find, job.klass_id)
         request = obj.qb_payload
         request = QBWC::Request.new(request)
-        add_before_session_hook(obj)
         advance
       end
       request
@@ -48,10 +51,6 @@ module QBWC
     private
     def setup
       self.ticket = Digest::SHA1.hexdigest("#{Rails.application.config.secret_token}#{Time.now.to_i}")
-    end
-
-    def add_before_session_hook(instance)
-      @@before_session_hooks << instance.class
     end
 
     def run_before_session_hooks

@@ -2,6 +2,7 @@ module QBWC
   module ModelMethods
     def self.included(base)
       base.extend ClassMethods
+      QBWC::QbwcSession.add_before_session_hook(base)
     end
 
     def qb_payload
