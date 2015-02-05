@@ -1,13 +1,13 @@
 module QBWC
   class QbwcSession < ActiveRecord::Base
     before_create :setup
-    after_destroy :run_after_destroy_hooks
+    before_create :run_before_session_hooks
 
     belongs_to :previous_job, class_name: QBWC::QbwcJob, foreign_key: :prev_qbwc_job_id
     belongs_to :next_job,     class_name: QBWC::QbwcJob, foreign_key: :next_qbwc_job_id
 
     attr_accessor :response
-    @@after_destroy_hooks = Set.new
+    @@before_session_hooks = Set.new
 
     def current_request
       request = nil
@@ -15,7 +15,7 @@ module QBWC
         obj = eval(job.klass).send(:find, job.klass_id)
         request = obj.qb_payload
         request = QBWC::Request.new(request)
-        add_after_destroy_hook(obj)
+        add_before_session_hook(obj)
         advance
       end
       request
@@ -50,13 +50,13 @@ module QBWC
       self.ticket = Digest::SHA1.hexdigest("#{Rails.application.config.secret_token}#{Time.now.to_i}")
     end
 
-    def add_after_destroy_hook(instance)
-      @@after_destroy_hooks << instance.class
+    def add_before_session_hook(instance)
+      @@before_session_hooks << instance.class
     end
 
-    def run_after_destroy_hooks
-      @@after_destroy_hooks.each do |klass|
-        klass.on_qb_session_close
+    def run_before_session_hooks
+      @@before_session_hooks.each do |klass|
+        klass.before_qb_session
       end
     end
   end

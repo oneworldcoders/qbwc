@@ -1,6 +1,6 @@
 module QBWC
   module ModelMethods
-    def included(base)
+    def self.included(base)
       base.extend ClassMethods
     end
 
@@ -20,7 +20,7 @@ module QBWC
     end
 
     module ClassMethods
-      def on_qb_session_close
+      def before_qb_session
         nil
       end
     end
