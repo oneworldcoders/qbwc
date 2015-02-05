@@ -81,6 +81,7 @@ QWC
     def authenticate
       user = authenticate_user(params[:strUserName], params[:strPassword])
       if user
+        QBWC::QbwcSession.run_before_session_hooks
         company = current_company
         ticket = QBWC::QbwcSession.create.ticket if company
         company ||= 'none'

@@ -1,7 +1,6 @@
 module QBWC
   class QbwcSession < ActiveRecord::Base
     before_create :setup
-    before_create :run_before_session_hooks
 
     belongs_to :previous_job, class_name: QBWC::QbwcJob, foreign_key: :prev_qbwc_job_id
     belongs_to :next_job,     class_name: QBWC::QbwcJob, foreign_key: :next_qbwc_job_id
@@ -9,8 +8,16 @@ module QBWC
     attr_accessor :response
     @@before_session_hooks = Set.new
 
-    def self.add_before_session_hook(instance)
-      @@before_session_hooks << instance.class
+    # NOTE: using this hook requires that your Rails application
+    # eager-load models via `Rails.application.eager_load!`
+    def self.add_before_session_hook(klass)
+      @@before_session_hooks << klass
+    end
+
+    def self.run_before_session_hooks
+      @@before_session_hooks.each do |klass|
+        klass.before_qb_session
+      end
     end
 
     def current_request
@@ -51,12 +58,6 @@ module QBWC
     private
     def setup
       self.ticket = Digest::SHA1.hexdigest("#{Rails.application.config.secret_token}#{Time.now.to_i}")
-    end
-
-    def run_before_session_hooks
-      @@before_session_hooks.each do |klass|
-        klass.before_qb_session
-      end
     end
   end
 end
