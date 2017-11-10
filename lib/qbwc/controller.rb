@@ -19,7 +19,7 @@ module QBWC
         soap_action 'authenticate',
                     :args   => {:strUserName => :string, :strPassword => :string},
                     :return => {'tns:authenticateResult' => StringArray},
-                    :response_tag => 'tns:authenticateResponse'
+                    :response_tag => 'authenticateResponse'
 
         soap_action 'sendRequestXML', :to => :send_request,
                     :args   => {:ticket => :string, :strHCPResponse => :string, :strCompanyFilename => :string, :qbXMLCountry => :string, :qbXMLMajorVers => :string, :qbXMLMinorVers => :string},
