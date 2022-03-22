@@ -2,8 +2,8 @@ module QBWC
   class QbwcSession < ActiveRecord::Base
     before_create :setup
 
-    belongs_to :previous_job, class_name: QBWC::QbwcJob, foreign_key: :prev_qbwc_job_id
-    belongs_to :next_job,     class_name: QBWC::QbwcJob, foreign_key: :next_qbwc_job_id
+    belongs_to :previous_job, class_name: 'QBWC::QbwcJob', foreign_key: :prev_qbwc_job_id
+    belongs_to :next_job,     class_name: 'QBWC::QbwcJob', foreign_key: :next_qbwc_job_id
 
     attr_accessor :response
     @@before_session_hooks = Set.new
