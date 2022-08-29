@@ -58,7 +58,7 @@ module QBWC
     def qwc
       qwc = <<QWC
 <QBWCXML>
-   <AppName>#{Rails.application.class.parent_name} #{Rails.env} #{@app_name_suffix}</AppName>
+   <AppName>#{Rails::VERSION::MAJOR >= 6 ? Rails.application.class.module_parent_name : Rails.application.class.parent_name} #{Rails.env} #{@app_name_suffix}</AppName>
    <AppID></AppID>
    <AppURL>#{QBWC.app_url || (root_url(:protocol => 'https://')+'qbwc/action')}</AppURL>
    <AppDescription>Quickbooks integration</AppDescription>
@@ -70,7 +70,7 @@ module QBWC
    <Style>Document</Style>
 </QBWCXML>
 QWC
-      send_data qwc, :filename => "#{@filename || Rails.application.class.parent_name}.qwc", :content_type => 'application/x-qwc'
+      send_data qwc, :filename => "#{@filename || Rails::VERSION::MAJOR >= 6 ? Rails.application.class.module_parent_name : Rails.application.class.parent_name}.qwc", :content_type => 'application/x-qwc'
     end
 
     class StringArray < WashOut::Type
